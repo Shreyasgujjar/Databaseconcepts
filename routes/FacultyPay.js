@@ -3,16 +3,16 @@ const router = express.Router();
 var con = require('../metadata/config');
 
 router.post("/", (req, res) => {
-    var query = `INSERT INTO STUDENT_HIRE_DATA VALUES (NULL, '${req.body.FirstName}', '${req.body.LastName}', '${req.body.UIN}', '${req.body.Salary}', '${req.body.EmploymentType}', '${req.body.WorkLoad}', '${req.body.StartDate}', '${req.body.EndDate}'`;
+    var query = `INSERT INTO FACULTY_PAY (NULL, ${req.body.PaymentAmount}, '${req.body.PaymentDate}', '${req.body.Userid}')`;
     con.query(query, (err, results, fields) => {
         if (err) {
             console.log(err);
             res.status(500).json({
-                message: "There was a problem creating the Hire information",
+                message: "There was a problem creating the pay information",
                 status: 'FAILURE'
             })
         } else {
-            query = `INSERT INTO GRANT_HIRE VALUES (${req.body.GrantId}, ${results[0].HireId})`;
+            query = `INSERT INTO GRANT_PAY VALUES (${req.body.GrantId}, ${results[0].PaymentId})`;
             con.query(query, (err, results, fields) => {
                 if (err) {
                     console.log(err);
@@ -22,7 +22,7 @@ router.post("/", (req, res) => {
                     })
                 } else {
                     res.status(200).json({
-                        message: "Hire information created successfully",
+                        message: "Payment information created successfully",
                         status: "SUCCESS"
                     })
                 }
@@ -32,17 +32,17 @@ router.post("/", (req, res) => {
 })
 
 router.get("/", (req, res) => {
-    var query = "SELECT * FROM STUDENT_HIRE_DATA";
+    var query = "SELECT * FROM FACULTY_PAY";
     con.query(query, (err, results, fields) => {
         if (err) {
             console.log(err);
             res.status(500).json({
-                message: "There was a problem fetching the Hire information",
+                message: "There was a problem fetching the payment information",
                 status: 'FAILURE'
             })
         } else {
             res.status(200).json({
-                message: "Hire information fetched successfully",
+                message: "Payment information fetched successfully",
                 status: "SUCCESS",
                 data: results
             })
@@ -51,17 +51,17 @@ router.get("/", (req, res) => {
 })
 
 router.get("/getspecific/:id", (req, res) => {
-    var query = "SELECT * FROM STUDENT_HIRE_DATA WHERE HireId = " + req.params.id;
+    var query = "SELECT * FROM FACULTY_PAY WHERE PaymentId = " + req.params.id;
     con.query(query, (err, results, fields) => {
         if (err) {
             console.log(err);
             res.status(500).json({
-                message: "There was a problem fetching the hire information",
+                message: "There was a problem fetching the payment information",
                 status: 'FAILURE'
             })
         } else {
             res.status(200).json({
-                message: "Hire information fetched successfully",
+                message: "Payment information fetched successfully",
                 status: "SUCCESS",
                 data: results
             })

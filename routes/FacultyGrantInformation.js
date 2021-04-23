@@ -12,9 +12,20 @@ router.post("/", (req, res) => {
                 status: 'FAILURE'
             })
         } else {
-            res.status(200).json({
-                message: "Grant information created successfully",
-                status: "SUCCESS"
+            query = `INSERT INTO GRANT_DATA VALUES (${req.body.GrantId}, ${req.body.UserId})`;
+            con.query(query, (err, results, fields) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({
+                        message: "There was a problem creating the mapping information",
+                        status: 'FAILURE'
+                    })
+                } else {
+                    res.status(200).json({
+                        message: "Grant information created successfully",
+                        status: "SUCCESS"
+                    })
+                }
             })
         }
     })
