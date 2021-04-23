@@ -12,6 +12,7 @@ const users = require("./routes/User");
 const facultyGrantInformation = require("./routes/FacultyGrantInformation");
 const studentHireData = require("./routes/StudentHireData");
 const purchase = require("./routes/Purchase");
+const facultyPay = require("./routes/FacultyPay");
 
 const http = require('http').createServer(app);
 
@@ -34,5 +35,6 @@ app.use("/users", users);
 app.use("/facultygrantinfo", facultyGrantInformation);
 app.use("/purchase", purchase);
 app.use("/studenthire", studentHireData);
+app.use("facultypay", facultyPay);
 
 http.listen(port, () => console.log("app running at - " + port))
