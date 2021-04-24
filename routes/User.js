@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 var con = require('../metadata/config');
 const saltHash = require("../helper/saltHash");
+const otp = require("otp-generator");
 const { validatePass } = require('../helper/saltHash');
+const email = require('../helper/email');
 
 router.post("/", (req, res) => {
     con.query("SELECT email FROM USERS WHERE email = " + "'" + req.body.email + "'", async(err, result, fields) => {
@@ -51,6 +53,87 @@ router.post("/", (req, res) => {
                         status: 'FAILURE'
                     })
                 }
+            }
+        }
+    })
+})
+
+router.post("/frgtpass", (req, res) => {
+    var query = `SELECT * FROM USERS WHERE Email = '${req.body.Email}'`;
+    con.query(query, (err, result) => {
+        if(err){
+            res.status(500).json({
+                message: "There was a problem while finding the user",
+                status: "FAILURE"
+            })
+        } else {
+            if(result.length != 0){
+                var samplePassword = otp.generate(8, { specialChars: false });
+                var hashPass = await saltHash.genSalt(samplePassword);
+                query = `UPDATE USERS SET Password = ${hashPass} WHERE Email = '${req.body.Email}'`;
+                con.query(query, async (err, results) => {
+                    if(err){
+                        console.log(err);
+                        res.status(500).json({
+                            message: "There was an error updating the password",
+                            status: "FAILURE"
+                        });
+                    }else{
+                        if(await email.frgtpass(`Please use the temporary password ${samplePassword} to login and change the password.\n\nThanks,\nFinancial Management Team.`, req.body.Email)){
+                            res.status(500).json({
+                                message: "There was an error sending the password",
+                                status: "FAILURE"
+                            });
+                        }else{
+                            res.status(200).json({
+                                message: "A temporary password has been sent to your email id",
+                                status: "SUCCESS"
+                            });
+                        }
+                    }
+                })
+            } else {
+                res.status(400).json({
+                    message: "There was an error finding the specified user",
+                    status: "FAILURE"
+                })
+            }
+        }
+    })
+})
+
+router.put("/resetpwd", (req, res) => {
+    var query = `SELECT * FROM USERS WHERE Email = '${req.body.Email}'`;
+    con.query(query, (err, result) => {
+        if(err){
+            res.status(500).json({
+                message: "There was a problem while finding the user",
+                status: "FAILURE"
+            })
+        }else{
+            if(result.length != 0){
+                var samplePassword = req.body.Password;
+                var hashPass = await saltHash.genSalt(samplePassword);
+                query = `UPDATE USERS SET Password = ${hashPass} WHERE Email = '${req.body.Email}'`;
+                con.query(query, async (err, results) => {
+                    if(err){
+                        console.log(err);
+                        res.status(500).json({
+                            message: "There was an error updating the password",
+                            status: "FAILURE"
+                        });
+                    }else{
+                        res.status(200).json({
+                            message: "Password reset successfull",
+                            status: "SUCCESS"
+                        });
+                    }
+                })
+            }else{
+                res.status(400).json({
+                    message: "There was an error finding the specified user",
+                    status: "FAILURE"
+                })
             }
         }
     })
