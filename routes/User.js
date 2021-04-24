@@ -60,7 +60,7 @@ router.post("/", (req, res) => {
 
 router.post("/frgtpass", (req, res) => {
     var query = `SELECT * FROM USERS WHERE Email = '${req.body.Email}'`;
-    con.query(query, (err, result) => {
+    con.query(query, async (err, result) => {
         if(err){
             res.status(500).json({
                 message: "There was a problem while finding the user",
@@ -104,7 +104,7 @@ router.post("/frgtpass", (req, res) => {
 
 router.put("/resetpwd", (req, res) => {
     var query = `SELECT * FROM USERS WHERE Email = '${req.body.Email}'`;
-    con.query(query, (err, result) => {
+    con.query(query, async (err, result) => {
         if(err){
             res.status(500).json({
                 message: "There was a problem while finding the user",
