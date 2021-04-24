@@ -110,6 +110,7 @@ router.post("/login", (req, res) => {
             res.status(500).json({
                 message: "There was a problem while fetching the user",
                 status: 'FAILURE',
+                superuser: result[0].SuperUser
             })
         }else{
             if(await validatePass(req.body.Password, result[0].Password)){
