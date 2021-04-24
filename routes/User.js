@@ -20,10 +20,10 @@ router.post("/", (req, res) => {
                     message: "It seems as if the contact information for the user is already created.",
                     status: 'BAD_REQUEST'
                 })
-            } else{
+            } else {
                 let password = req.body.Password;
                 var hashPass = await saltHash.genSalt(password);
-                if(hashPass){
+                if (hashPass) {
                     var query = "INSERT INTO USERS VALUES(NULL," +
                         "'" + req.body.FirstName + "'," +
                         "'" + req.body.LastName + "'," +
@@ -47,7 +47,7 @@ router.post("/", (req, res) => {
                             })
                         }
                     });
-                }else{
+                } else {
                     res.status(500).json({
                         message: "There was a problem while creating the password",
                         status: 'FAILURE'
@@ -60,31 +60,31 @@ router.post("/", (req, res) => {
 
 router.post("/frgtpass", (req, res) => {
     var query = `SELECT * FROM USERS WHERE Email = '${req.body.Email}'`;
-    con.query(query, (err, result) => {
-        if(err){
+    con.query(query, async(err, result) => {
+        if (err) {
             res.status(500).json({
                 message: "There was a problem while finding the user",
                 status: "FAILURE"
             })
         } else {
-            if(result.length != 0){
+            if (result.length != 0) {
                 var samplePassword = otp.generate(8, { specialChars: false });
                 var hashPass = await saltHash.genSalt(samplePassword);
                 query = `UPDATE USERS SET Password = ${hashPass} WHERE Email = '${req.body.Email}'`;
-                con.query(query, async (err, results) => {
-                    if(err){
+                con.query(query, async(err, results) => {
+                    if (err) {
                         console.log(err);
                         res.status(500).json({
                             message: "There was an error updating the password",
                             status: "FAILURE"
                         });
-                    }else{
-                        if(await email.frgtpass(`Please use the temporary password ${samplePassword} to login and change the password.\n\nThanks,\nFinancial Management Team.`, req.body.Email)){
+                    } else {
+                        if (await email.frgtpass(`Please use the temporary password ${samplePassword} to login and change the password.\n\nThanks,\nFinancial Management Team.`, req.body.Email)) {
                             res.status(500).json({
                                 message: "There was an error sending the password",
                                 status: "FAILURE"
                             });
-                        }else{
+                        } else {
                             res.status(200).json({
                                 message: "A temporary password has been sent to your email id",
                                 status: "SUCCESS"
@@ -104,32 +104,32 @@ router.post("/frgtpass", (req, res) => {
 
 router.put("/resetpwd", (req, res) => {
     var query = `SELECT * FROM USERS WHERE Email = '${req.body.Email}'`;
-    con.query(query, (err, result) => {
-        if(err){
+    con.query(query, async(err, result) => {
+        if (err) {
             res.status(500).json({
                 message: "There was a problem while finding the user",
                 status: "FAILURE"
             })
-        }else{
-            if(result.length != 0){
+        } else {
+            if (result.length != 0) {
                 var samplePassword = req.body.Password;
                 var hashPass = await saltHash.genSalt(samplePassword);
                 query = `UPDATE USERS SET Password = ${hashPass} WHERE Email = '${req.body.Email}'`;
-                con.query(query, async (err, results) => {
-                    if(err){
+                con.query(query, async(err, results) => {
+                    if (err) {
                         console.log(err);
                         res.status(500).json({
                             message: "There was an error updating the password",
                             status: "FAILURE"
                         });
-                    }else{
+                    } else {
                         res.status(200).json({
                             message: "Password reset successfull",
                             status: "SUCCESS"
                         });
                     }
                 })
-            }else{
+            } else {
                 res.status(400).json({
                     message: "There was an error finding the specified user",
                     status: "FAILURE"
@@ -149,27 +149,27 @@ router.get("/", (req, res) => {
                 message: "There was a problem while creating the user",
                 status: 'FAILURE',
             })
-        }else{
+        } else {
             res.status(200).json({
                 message: "Successfully fetched the data",
                 status: 'SUCCESS',
                 result: result
             })
         }
-    }); 
+    });
 })
 
 router.post("/login", (req, res) => {
     var query = "SELECT Password FROM USERS WHERE Email = '" + req.body.Email + "'";
-    con.query(query, async (err, result) => {
+    con.query(query, async(err, result) => {
         if (err) {
             console.log(err)
             res.status(500).json({
                 message: "There was a problem while fetching the user",
                 status: 'FAILURE',
             })
-        }else{
-            if(await validatePass(req.body.Password, result[0].Password)){
+        } else {
+            if (await validatePass(req.body.Password, result[0].Password)) {
                 res.status(200).json({
                     message: "Successfully fetched the data",
                     status: 'SUCCESS',
@@ -181,7 +181,7 @@ router.post("/login", (req, res) => {
                 })
             }
         }
-    }); 
+    });
 })
 
 module.exports = router;
