@@ -112,7 +112,7 @@ router.delete("/deletehire/:hireId", (req, res) => {
         if(err){
             console.log(err);
             res.status(500).json({
-                message: "There was an error deleting the hire details",re
+                message: "There was an error deleting the hire details",
                 status: "FAILURE"
             })
         } else {
