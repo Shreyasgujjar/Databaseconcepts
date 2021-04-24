@@ -69,6 +69,25 @@ router.get("/getallinfo", (req, res) => {
     })
 })
 
+router.get("/getgrantsforuser/:userid", (req, res) => {
+    var query = `SELECT * FROM FACULTY_GRANT_INFORMATION WHERE GrantId = (SELECT GrantId FROM GRANT_DATA WHERE UserId = ${req.params.userid})`;
+    con.query(query, (err, results, fields) => {
+        if (err) {
+            console.log(err);
+            res.status(500).json({
+                message: "There was a problem fetching the grant information",
+                status: 'FAILURE'
+            })
+        } else {
+            res.status(200).json({
+                message: "Grant information fetched successfully",
+                status: "SUCCESS",
+                data: results
+            })
+        }
+    })
+})
+
 router.get("/getspecific/:id", (req, res) => {
     var query = "SELECT * FROM FACULTY_GRANT_INFORMATION WHERE GrantId = " + req.params.id;
     con.query(query, (err, results, fields) => {
