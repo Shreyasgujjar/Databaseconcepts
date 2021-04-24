@@ -102,6 +102,77 @@ router.post("/frgtpass", (req, res) => {
     })
 })
 
+router.post("/login", (req, res) => {
+    var query = "SELECT Password FROM USERS WHERE Email = '" + req.body.Email + "'";
+    con.query(query, async (err, result) => {
+        if (err) {
+            console.log(err)
+            res.status(500).json({
+                message: "There was a problem while fetching the user",
+                status: 'FAILURE',
+            })
+        }else{
+            if(await validatePass(req.body.Password, result[0].Password)){
+                res.status(200).json({
+                    message: "Successfully fetched the data",
+                    status: 'SUCCESS',
+                })
+            } else {
+                res.status(400).json({
+                    message: "WRONG PASSWORD",
+                    status: 'FAILURE'
+                })
+            }
+        }
+    }); 
+})
+
+router.get("/", (req, res) => {
+    var query = "SELECT * FROM USERS";
+
+    con.query(query, (err, result) => {
+        if (err) {
+            console.log(err)
+            res.status(500).json({
+                message: "There was a problem while creating the user",
+                status: 'FAILURE',
+            })
+        }else{
+            res.status(200).json({
+                message: "Successfully fetched the data",
+                status: 'SUCCESS',
+                result: result
+            })
+        }
+    }); 
+})
+
+router.get("/getspecific/:userid", (req, res) => {
+    var query = `SELECT * FROM USERS WHERE UserId = ${req.params.userid}`;
+    con.query(query, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(500).json({
+                message: "There was an error finding the user",
+                status: "SUCCESS"
+            })
+        }else {
+            if(result.length != 0){
+                res.status(200).json({
+                    message: "Found the user successfully",
+                    status: "SUCCESS",
+                    data: result
+                })
+            }else {
+                res.status(400).json({
+                    message: "Could not find the user",
+                    status: "FAILURE"
+                })
+            }
+        }
+    })
+})
+
 router.put("/resetpwd", (req, res) => {
     var query = `SELECT * FROM USERS WHERE Email = '${req.body.Email}'`;
     con.query(query, async (err, result) => {
@@ -132,77 +203,6 @@ router.put("/resetpwd", (req, res) => {
             }else{
                 res.status(400).json({
                     message: "There was an error finding the specified user",
-                    status: "FAILURE"
-                })
-            }
-        }
-    })
-})
-
-router.get("/", (req, res) => {
-    var query = "SELECT * FROM USERS";
-
-    con.query(query, (err, result) => {
-        if (err) {
-            console.log(err)
-            res.status(500).json({
-                message: "There was a problem while creating the user",
-                status: 'FAILURE',
-            })
-        }else{
-            res.status(200).json({
-                message: "Successfully fetched the data",
-                status: 'SUCCESS',
-                result: result
-            })
-        }
-    }); 
-})
-
-router.post("/login", (req, res) => {
-    var query = "SELECT Password FROM USERS WHERE Email = '" + req.body.Email + "'";
-    con.query(query, async (err, result) => {
-        if (err) {
-            console.log(err)
-            res.status(500).json({
-                message: "There was a problem while fetching the user",
-                status: 'FAILURE',
-            })
-        }else{
-            if(await validatePass(req.body.Password, result[0].Password)){
-                res.status(200).json({
-                    message: "Successfully fetched the data",
-                    status: 'SUCCESS',
-                })
-            } else {
-                res.status(400).json({
-                    message: "WRONG PASSWORD",
-                    status: 'FAILURE'
-                })
-            }
-        }
-    }); 
-})
-
-router.get("/getspecific/:userid", (req, res) => {
-    var query = `SELECT * FROM USERS WHERE UserId = ${req.params.userid}`;
-    con.query(query, (err, result) => {
-        if(err){
-            console.log(err);
-            res.status(500).json({
-                message: "There was an error finding the user",
-                status: "SUCCESS"
-            })
-        }else {
-            if(result.length != 0){
-                res.status(200).json({
-                    message: "Found the user successfully",
-                    status: "SUCCESS",
-                    data: result
-                })
-            }else {
-                res.status(400).json({
-                    message: "Could not find the user",
                     status: "FAILURE"
                 })
             }
