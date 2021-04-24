@@ -184,4 +184,48 @@ router.post("/login", (req, res) => {
     }); 
 })
 
+router.get("/getspecific/:userid", (req, res) => {
+    var query = `SELECT * FROM USERS WHERE UserId = ${req.params.userid}`;
+    con.query(query, (err, result) => {
+        if(err){
+            console.log(err);
+            res.status(500).json({
+                message: "There was an error finding the user",
+                status: "SUCCESS"
+            })
+        }else {
+            if(result.length != 0){
+                res.status(200).json({
+                    message: "Found the user successfully",
+                    status: "SUCCESS",
+                    data: result
+                })
+            }else {
+                res.status(400).json({
+                    message: "Could not find the user",
+                    status: "FAILURE"
+                })
+            }
+        }
+    })
+})
+
+router.put("/edituserdet/:userid", (req, res) => {
+    var query = `UPDATE USERS SET FirstName = '${req.body.FirstName}', LastName = '${req.body.LastName}', Address = '${req.body.Address}', OfficePhone = '${req.body.OfficePhone}', CellPhone = '${req.body.CellPhone}' WHERE UserId = ${req.params.userid}`;
+    con.query(query, (err, result) => {
+        if(err){
+            console.log(error);
+            res.status(500).json({
+                message: "There was an error updating the data",
+                status: "FAILURE"
+            })
+        }else {
+            res.status(200).json({
+                message: "Successfully updated the users data",
+                status: "SUCCESS"
+            })
+        }
+    })
+})
+
 module.exports = router;
