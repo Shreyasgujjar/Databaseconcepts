@@ -3,7 +3,7 @@ const router = express.Router();
 var con = require('../metadata/config');
 
 router.post("/", (req, res) => {
-    var query = `INSERT INTO STUDENT_HIRE_DATA VALUES (NULL, '${req.body.FirstName}', '${req.body.LastName}', '${req.body.UIN}', '${req.body.Salary}', '${req.body.EmploymentType}', '${req.body.WorkLoad}', '${req.body.StartDate}', '${req.body.EndDate}'`;
+    var query = `INSERT INTO STUDENT_HIRE_DATA VALUES (NULL, '${req.body.FirstName}', '${req.body.LastName}', '${req.body.UIN}', '${req.body.Salary}', '${req.body.EmploymentType}', '${req.body.WorkLoad}', '${req.body.StartDate}', '${req.body.EndDate}')`;
     con.query(query, (err, results, fields) => {
         if (err) {
             console.log(err);
@@ -12,7 +12,7 @@ router.post("/", (req, res) => {
                 status: 'FAILURE'
             })
         } else {
-            query = `INSERT INTO GRANT_HIRE VALUES (${req.body.GrantId}, ${results[0].HireId})`;
+            query = `INSERT INTO GRANT_HIRE VALUES (${req.body.GrantId}, ${results.insertId})`;
             con.query(query, (err, results, fields) => {
                 if (err) {
                     console.log(err);

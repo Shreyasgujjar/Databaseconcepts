@@ -102,6 +102,79 @@ router.post("/frgtpass", (req, res) => {
     })
 })
 
+router.post("/login", (req, res) => {
+    var query = "SELECT Password FROM USERS WHERE Email = '" + req.body.Email + "'";
+    con.query(query, async(err, result) => {
+        if (err) {
+            console.log(err)
+            res.status(500).json({
+                message: "There was a problem while fetching the user",
+                status: 'FAILURE',
+                superuser: result[0].SuperUser,
+                userId: result[0].UserId
+            })
+        } else {
+            if (await validatePass(req.body.Password, result[0].Password)) {
+                res.status(200).json({
+                    message: "Successfully fetched the data",
+                    status: 'SUCCESS',
+                })
+            } else {
+                res.status(400).json({
+                    message: "WRONG PASSWORD",
+                    status: 'FAILURE'
+                })
+            }
+        }
+    });
+})
+
+router.get("/", (req, res) => {
+    var query = "SELECT * FROM USERS";
+
+    con.query(query, (err, result) => {
+        if (err) {
+            console.log(err)
+            res.status(500).json({
+                message: "There was a problem while creating the user",
+                status: 'FAILURE',
+            })
+        } else {
+            res.status(200).json({
+                message: "Successfully fetched the data",
+                status: 'SUCCESS',
+                result: result
+            })
+        }
+    });
+})
+
+router.get("/getspecific/:userid", (req, res) => {
+    var query = `SELECT * FROM USERS WHERE UserId = ${req.params.userid}`;
+    con.query(query, (err, result) => {
+        if (err) {
+            console.log(err);
+            res.status(500).json({
+                message: "There was an error finding the user",
+                status: "SUCCESS"
+            })
+        } else {
+            if (result.length != 0) {
+                res.status(200).json({
+                    message: "Found the user successfully",
+                    status: "SUCCESS",
+                    data: result
+                })
+            } else {
+                res.status(400).json({
+                    message: "Could not find the user",
+                    status: "FAILURE"
+                })
+            }
+        }
+    })
+})
+
 router.put("/resetpwd", (req, res) => {
     var query = `SELECT * FROM USERS WHERE Email = '${req.body.Email}'`;
     con.query(query, async(err, result) => {
@@ -139,49 +212,22 @@ router.put("/resetpwd", (req, res) => {
     })
 })
 
-router.get("/", (req, res) => {
-    var query = "SELECT * FROM USERS";
-
+router.put("/edituserdet/:userid", (req, res) => {
+    var query = `UPDATE USERS SET FirstName = '${req.body.FirstName}', LastName = '${req.body.LastName}', Address = '${req.body.Address}', OfficePhone = '${req.body.OfficePhone}', CellPhone = '${req.body.CellPhone}' WHERE UserId = ${req.params.userid}`;
     con.query(query, (err, result) => {
         if (err) {
-            console.log(err)
+            console.log(error);
             res.status(500).json({
-                message: "There was a problem while creating the user",
-                status: 'FAILURE',
+                message: "There was an error updating the data",
+                status: "FAILURE"
             })
         } else {
             res.status(200).json({
-                message: "Successfully fetched the data",
-                status: 'SUCCESS',
-                result: result
+                message: "Successfully updated the users data",
+                status: "SUCCESS"
             })
         }
-    });
-})
-
-router.post("/login", (req, res) => {
-    var query = "SELECT Password FROM USERS WHERE Email = '" + req.body.Email + "'";
-    con.query(query, async(err, result) => {
-        if (err) {
-            console.log(err)
-            res.status(500).json({
-                message: "There was a problem while fetching the user",
-                status: 'FAILURE',
-            })
-        } else {
-            if (await validatePass(req.body.Password, result[0].Password)) {
-                res.status(200).json({
-                    message: "Successfully fetched the data",
-                    status: 'SUCCESS',
-                })
-            } else {
-                res.status(400).json({
-                    message: "WRONG PASSWORD",
-                    status: 'FAILURE'
-                })
-            }
-        }
-    });
+    })
 })
 
 module.exports = router;
