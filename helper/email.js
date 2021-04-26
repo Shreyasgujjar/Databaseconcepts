@@ -32,4 +32,25 @@ async function frgtpass(message, email) {
     })
 }
 
-module.exports = { frgtpass: frgtpass }
+async function registerSuccessfull(message, email) {
+    var mailOptions = {
+        from: 'mailsender1998@gmail.com',
+        to: email,
+        subject: 'Registration successfull (FMS)',
+        text: message
+    };
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                console.log(error);
+                resolve(false)
+            } else {
+                console.log('Email sent');
+                resolve(true)
+            }
+        })
+
+    })
+}
+
+module.exports = { frgtpass: frgtpass, registerSuccessfull: registerSuccessfull }

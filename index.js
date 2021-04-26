@@ -32,9 +32,9 @@ app.use((req, res, next) => {
 });
 
 app.use("/users", users);
-app.use("/facultygrantinfo", facultyGrantInformation);
+app.use("/facultygrantinfo", facultyGrantInformation.router);
 app.use("/purchase", purchase);
 app.use("/studenthire", studentHireData);
-app.use("facultypay", facultyPay);
+app.use("/facultypay", facultyPay);
 
 http.listen(port, () => console.log("app running at - " + port))
