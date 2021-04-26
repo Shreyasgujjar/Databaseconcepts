@@ -20,10 +20,10 @@ router.post("/", (req, res) => {
                     message: "It seems as if the contact information for the user is already created.",
                     status: 'BAD_REQUEST'
                 })
-            } else{
+            } else {
                 let password = req.body.Password;
                 var hashPass = await saltHash.genSalt(password);
-                if(hashPass){
+                if (hashPass) {
                     var query = "INSERT INTO USERS VALUES(NULL," +
                         "'" + req.body.FirstName + "'," +
                         "'" + req.body.MiddleName + "'," +
@@ -116,7 +116,7 @@ router.post("/admin", (req, res) => {
                             }
                         }
                     });
-                }else{
+                } else {
                     res.status(500).json({
                         message: "There was a problem while creating the password",
                         status: 'FAILURE'
@@ -203,7 +203,7 @@ router.post("/login", (req, res) => {
                 })
             }
         }
-    }); 
+    });
 })
 
 router.get("/", (req, res) => {
@@ -215,33 +215,33 @@ router.get("/", (req, res) => {
                 message: "There was a problem while creating the user",
                 status: 'FAILURE',
             })
-        }else{
+        } else {
             res.status(200).json({
                 message: "Successfully fetched the data",
                 status: 'SUCCESS',
                 result: result
             })
         }
-    }); 
+    });
 })
 
 router.get("/getspecific/:userid", (req, res) => {
     var query = `SELECT * FROM USERS WHERE UserId = ${req.params.userid}`;
     con.query(query, (err, result) => {
-        if(err){
+        if (err) {
             console.log(err);
             res.status(500).json({
                 message: "There was an error finding the user",
                 status: "SUCCESS"
             })
-        }else {
-            if(result.length != 0){
+        } else {
+            if (result.length != 0) {
                 res.status(200).json({
                     message: "Found the user successfully",
                     status: "SUCCESS",
                     data: result
                 })
-            }else {
+            } else {
                 res.status(400).json({
                     message: "Could not find the user",
                     status: "FAILURE"
@@ -319,13 +319,13 @@ router.put("/resetpwd/:userid", (req, res) => {
 router.put("/edituserdet/:userid", (req, res) => {
     var query = `UPDATE USERS SET FirstName = '${req.body.FirstName}', LastName = '${req.body.LastName}', Address = '${req.body.Address}', OfficePhone = '${req.body.OfficePhone}', CellPhone = '${req.body.CellPhone}' WHERE UserId = ${req.params.userid}`;
     con.query(query, (err, result) => {
-        if(err){
+        if (err) {
             console.log(error);
             res.status(500).json({
                 message: "There was an error updating the data",
                 status: "FAILURE"
             })
-        }else {
+        } else {
             res.status(200).json({
                 message: "Successfully updated the users data",
                 status: "SUCCESS"
