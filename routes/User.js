@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 var con = require('../metadata/config');
-const saltHash = require("../helper/saltHash");
+const saltHash = require("../helper/salthash");
 const otp = require("otp-generator");
-const { validatePass } = require('../helper/saltHash');
+const { validatePass } = require('../helper/salthash');
 const email = require('../helper/email');
 
 router.post("/", (req, res) => {
