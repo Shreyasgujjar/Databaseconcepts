@@ -94,8 +94,8 @@ router.get("/getsumforfaculty/:userid", (req, res) => {
 })
 
 router.get("/admin/:userid", (req, res) => {
-    var query = `SELECT P.PurchaseId, P.ItemName, P.Quantity, P.UnitCost, P.TotalCost, P.OrderDate, P.DeliveryDate, P.ApprovalStatus, P.Status, F.GrantType, F.GrantFrom, F.GrantAmount, U.UserId, U.FirstName, U.MiddleName, U.LastName, U.Email FROM PURCHASE AS P, FACULTY_GRANT_INFORMATION AS F, USERS AS U, GRANT_DATA AS G WHERE P.GrantId = G.GrantId AND F.GrantId = P.GrantId AND G.UserId = U.UserId AND U.UserId = ${req.params.userid}`;
-    con.query(query, (err, result) => {
+    var query = `SELECT P.PurchaseId, P.ItemName, P.Quantity, P.UnitCost, P.TotalCost, P.OrderDate, P.DeliveryDate, P.ApprovalStatus, P.Status, F.GrantType, F.GrantFrom, F.GrantAmount, P.Purchaser as UserId FROM PURCHASE AS P, FACULTY_GRANT_INFORMATION AS F, USERS AS U, GRANT_DATA AS G WHERE P.GrantId = G.GrantId AND F.GrantId = P.GrantId AND G.UserId = U.UserId AND U.UserId = ${req.params.userid}`;
+    con.query(query, async (err, result) => {
         if(err){
             console.log(err);
             res.status(500).json({
@@ -103,6 +103,13 @@ router.get("/admin/:userid", (req, res) => {
                 status: "FAILURE"
             })
         }else{
+            for(var i = 0; i < result.length; i++){
+                var userDetails = await getUserDetails(result[i].UserId, '');
+                result[i].FirstName = userDetails[0].FirstName;
+                result[i].MiddleName = userDetails[0].MiddleName;
+                result[i].LastName = userDetails[0].LastName;
+                result[i].Email = userDetails[0].Email;
+            }
             res.status(200).json({
                 message: "Fetched all purchases successfully",
                 status: "SUCCESS",
@@ -116,8 +123,8 @@ router.get("/search/:userid", (req, res) => {
     if(req.query.searchData == undefined){
         req.query.searchData = '';
     }
-    var query = `SELECT P.PurchaseId, P.ItemName, P.Quantity, P.UnitCost, P.TotalCost, P.OrderDate, P.DeliveryDate, P.ApprovalStatus, P.Status, F.GrantType, F.GrantFrom, F.GrantAmount, U.UserId, U.FirstName, U.MiddleName, U.LastName, U.Email FROM PURCHASE AS P, FACULTY_GRANT_INFORMATION AS F, USERS AS U WHERE F.GrantId = P.GrantId AND U.UserId = P.Purchaser AND U.UserId = ${req.params.userid} AND (P.ItemName LIKE '%${req.query.searchData}%' OR P.Quantity LIKE '%${req.query.searchData}%' OR P.UnitCost LIKE '%${req.query.searchData}%' OR P.TotalCost LIKE '%${req.query.searchData}%' OR P.OrderDate LIKE '%${req.query.searchData}%' OR P.DeliveryDate LIKE '%${req.query.searchData}%' OR P.ApprovalStatus LIKE '%${req.query.searchData}%' OR P.Status LIKE '%${req.query.searchData}%' OR F.GrantType LIKE '%${req.query.searchData}%' OR F.GrantFrom LIKE '%${req.query.searchData}%' OR F.GrantAmount LIKE '%${req.query.searchData}%' OR U.FirstName LIKE '%${req.query.searchData}%' OR U.MiddleName LIKE '%${req.query.searchData}%' OR U.LastName LIKE '%${req.query.searchData}%' OR U.Email LIKE '%${req.query.searchData}%')`;
-    con.query(query, (err, result) => {
+    var query = `SELECT P.PurchaseId, P.ItemName, P.Quantity, P.UnitCost, P.TotalCost, P.OrderDate, P.DeliveryDate, P.ApprovalStatus, P.Status, F.GrantType, F.GrantFrom, F.GrantAmount, P.Purchaser as UserId FROM PURCHASE AS P, FACULTY_GRANT_INFORMATION AS F, USERS AS U, GRANT_DATA AS G WHERE P.GrantId = G.GrantId AND F.GrantId = P.GrantId AND G.UserId = U.UserId AND U.UserId = ${req.params.userid} AND (P.ItemName LIKE '%${req.query.searchData}%' OR P.Quantity LIKE '%${req.query.searchData}%' OR P.UnitCost LIKE '%${req.query.searchData}%' OR P.TotalCost LIKE '%${req.query.searchData}%' OR P.OrderDate LIKE '%${req.query.searchData}%' OR P.DeliveryDate LIKE '%${req.query.searchData}%' OR P.ApprovalStatus LIKE '%${req.query.searchData}%' OR P.Status LIKE '%${req.query.searchData}%' OR F.GrantType LIKE '%${req.query.searchData}%' OR F.GrantFrom LIKE '%${req.query.searchData}%' OR F.GrantAmount LIKE '%${req.query.searchData}%')`;
+    con.query(query, async (err, result) => {
         if(err){
             console.log(err);
             res.status(500).json({
@@ -125,6 +132,13 @@ router.get("/search/:userid", (req, res) => {
                 status: "FAILURE"
             })
         }else{
+            for(var i = 0; i < result.length; i++){
+                var userDetails = await getUserDetails(result[i].UserId, '');
+                result[i].FirstName = userDetails[0].FirstName;
+                result[i].MiddleName = userDetails[0].MiddleName;
+                result[i].LastName = userDetails[0].LastName;
+                result[i].Email = userDetails[0].Email;
+            }
             res.status(200).json({
                 message: "Fetched all purchases successfully",
                 status: "SUCCESS",
@@ -240,5 +254,14 @@ router.delete("/deletepurchase/:purchaseId", (req, res) => {
         }
     })
 })
+
+async function getUserDetails(userId, searchData){
+    return new Promise((resolve, reject) => {
+        var query = `SELECT * FROM USERS WHERE UserId = ${userId} AND (FirstName LIKE '%${searchData}%' OR LastName LIKE '%${searchData}%' OR MiddleName LIKE '%${searchData}%' OR Email LIKE '%${searchData}%')`;
+        con.query(query, (err, result) => {
+            resolve(result);
+        })
+    })
+}
 
 module.exports = router;

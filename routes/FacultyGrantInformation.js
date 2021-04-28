@@ -68,6 +68,7 @@ router.get("/balance/:userid", async (req, res) => {
     var query = `SELECT GrantId, GrantAmount FROM FACULTY_GRANT_INFORMATION WHERE GrantId IN (SELECT GrantId FROM GRANT_DATA WHERE UserId = ${req.params.userid})`;
     con.query(query, (err, result) => {
         if(err){
+            console.log(err);
             res.status(400).json({
                 message: "There was an error finding the balance",
                 status: "ERROR"

@@ -173,7 +173,7 @@ router.post("/frgtpass", (req, res) => {
 })
 
 router.post("/login", (req, res) => {
-    var query = "SELECT Password, SuperUser, UserId FROM USERS WHERE Email = '" + req.body.Email + "'";
+    var query = `SELECT Password, SuperUser, UserId FROM USERS WHERE Email = '${req.body.Email}'`;
     con.query(query, async (err, result) => {
         if (err) {
             console.log(err)
@@ -206,8 +206,8 @@ router.post("/login", (req, res) => {
     });
 })
 
-router.get("/", (req, res) => {
-    var query = "SELECT * FROM USERS";
+router.get("/:UserId", (req, res) => {
+    var query = `SELECT * FROM USERS WHERE UserId <> ${req.params.UserId}`;
     con.query(query, (err, result) => {
         if (err) {
             console.log(err)
@@ -251,8 +251,8 @@ router.get("/getspecific/:userid", (req, res) => {
     })
 })
 
-router.get("/search", (req, res) => {
-    var query = `SELECT * FROM USERS WHERE FirstName LIKE '%${req.query.searchData}%' OR MiddleName LIKE '%${req.query.searchData}%' OR LastName LIKE '%${req.query.searchData}%' OR Address LIKE '%${req.query.searchData}%' OR OfficePhone LIKE '%${req.query.searchData}%' OR CellPhone LIKE '%${req.query.searchData}%' OR Email LIKE '%${req.query.searchData}%'`;
+router.get("/search/:UserId", (req, res) => {
+    var query = `SELECT * FROM USERS WHERE UserId <> ${req.params.UserId} AND (FirstName LIKE '%${req.query.searchData}%' OR MiddleName LIKE '%${req.query.searchData}%' OR LastName LIKE '%${req.query.searchData}%' OR Address LIKE '%${req.query.searchData}%' OR OfficePhone LIKE '%${req.query.searchData}%' OR CellPhone LIKE '%${req.query.searchData}%' OR Email LIKE '%${req.query.searchData}%')`;
     con.query(query, (err, result) => {
         if (err) {
             console.log(err)
